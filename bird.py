@@ -1,4 +1,4 @@
-from pico2d import load_image
+from pico2d import load_image, get_canvas_width
 
 import game_framework
 
@@ -21,6 +21,9 @@ FLIGHT_SPEED_PPS = FLIGHT_SPEED_MPS * PIXEL_PER_METER
 # 비행 속도로부터 1초당 몇 프레임을 넘겨야 하는지가 정해진다.
 WINGBEAT_DISTANCE_M = 5.0
 FLIGHT_FRAMES_PER_SECOND = FLIGHT_SPEED_MPS / WINGBEAT_DISTANCE_M * FRAME_COUNT  # 10 / 5 * 14 = 28
+
+# 눈에서 꼬리/날개 끝까지 가장 먼 거리: 이만큼은 화면 안에 남겨야 잘리지 않는다
+BIRD_BACK_EXTENT = 125
 
 
 # 몸통(눈)을 기준점으로 쓰기 위한 값. 칸 안에서 눈의 x는 모든 프레임이 같고,
@@ -62,6 +65,15 @@ class Bird:
         self.frame = (self.frame + FLIGHT_FRAMES_PER_SECOND * game_framework.frame_time) % FRAME_COUNT
         # 이동 거리 = 속도 x 경과 시간
         self.x += self.dir * FLIGHT_SPEED_PPS * game_framework.frame_time
+        # 화면 양 끝에서는 넘어간 만큼 되돌아오며(반사) 방향을 바꾼다
+        left_limit = BIRD_BACK_EXTENT
+        right_limit = get_canvas_width() - BIRD_BACK_EXTENT
+        if self.x > right_limit:
+            self.x = 2 * right_limit - self.x
+            self.dir = -1
+        elif self.x < left_limit:
+            self.x = 2 * left_limit - self.x
+            self.dir = 1
 
     def draw(self):
         left, bottom, w, h, center_dx, center_dy = FRAMES[int(self.frame)]

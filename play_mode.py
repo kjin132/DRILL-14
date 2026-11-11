@@ -3,7 +3,7 @@ import game_world
 import game_framework
 from boy import Boy
 from grass import Grass
-from bird import Bird
+from bird import make_v_formation
 
 boy = None
 
@@ -31,8 +31,8 @@ def init():
     grass = Grass()
     game_world.add_oject(grass, 0)
 
-    bird = Bird(800, 480)
-    game_world.add_oject(bird)
+    for bird in make_v_formation(800, 450):
+        game_world.add_oject(bird)
 
 
 def pause():

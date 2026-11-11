@@ -50,6 +50,12 @@ def frame_rect(index):
 FRAMES = [frame_rect(i) for i in range(FRAME_COUNT)]
 
 
+# --- V자 편대 ---
+FORMATION_PAIRS = 3       # 리더 뒤로 3줄 (줄마다 위/아래 한 마리씩)
+FORMATION_SPACING_X = 90  # 한 줄 뒤로 물러나는 거리
+FORMATION_SPACING_Y = 36  # 한 줄 뒤로 갈수록 위/아래로 벌어지는 거리
+
+
 class Bird:
     image = None  # 모든 새가 공유하는 스프라이트 시트 (한 번만 로딩)
 
@@ -88,3 +94,13 @@ class Bird:
             Bird.image.clip_draw(left, bottom, w, h, x, y, draw_w, draw_h)
         else:
             Bird.image.clip_composite_draw(left, bottom, w, h, 0, 'h', x, y, draw_w, draw_h)
+
+
+def make_v_formation(leader_x, leader_y):
+    """오른쪽을 보고 나는 V자 편대(리더 1마리 + 뒤쪽 6마리)를 만들어 돌려준다."""
+    birds = [Bird(leader_x, leader_y)]
+    for k in range(1, FORMATION_PAIRS + 1):
+        for side in (+1, -1):
+            birds.append(Bird(leader_x - k * FORMATION_SPACING_X,
+                              leader_y + side * k * FORMATION_SPACING_Y))
+    return birds

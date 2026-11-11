@@ -66,4 +66,10 @@ class Bird:
     def draw(self):
         left, bottom, w, h, center_dx, center_dy = FRAMES[int(self.frame)]
         # (self.x, self.y)가 눈 위치가 되도록 사각형 중심을 옮겨서 그린다
-        Bird.image.clip_draw(left, bottom, w, h, self.x + center_dx, self.y + center_dy)
+        # 왼쪽을 볼 때는 좌우반전되므로 눈에서 중심까지의 x 거리도 반대가 된다
+        x = self.x + center_dx * self.dir
+        y = self.y + center_dy
+        if self.dir == 1:
+            Bird.image.clip_draw(left, bottom, w, h, x, y)
+        else:
+            Bird.image.clip_composite_draw(left, bottom, w, h, 0, 'h', x, y, w, h)

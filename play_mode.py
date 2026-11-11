@@ -1,9 +1,11 @@
+import random
+
 from pico2d import *
 import game_world
 import game_framework
 from boy import Boy
 from grass import Grass
-from bird import make_v_formation
+from bird import Bird, FRAME_COUNT
 
 boy = None
 
@@ -31,7 +33,13 @@ def init():
     grass = Grass()
     game_world.add_oject(grass, 0)
 
-    for bird in make_v_formation(800, 450):
+    # 새 10마리를 하나씩 따로 만들어 game_world에 추가한다 (위치, 방향, 크기, 속도가 모두 제각각)
+    for _ in range(10):
+        bird = Bird(random.randint(150, 1450), random.randint(340, 560),
+                    random.choice((-1, 1)),
+                    random.uniform(0.4, 0.6),
+                    random.uniform(28.0, 44.0),
+                    random.uniform(0, FRAME_COUNT))
         game_world.add_oject(bird)
 
 

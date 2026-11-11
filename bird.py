@@ -1,5 +1,7 @@
 from pico2d import load_image
 
+import game_framework
+
 # --- 스프라이트 시트(bird_animation.png, 918 x 506) 구조 ---
 SHEET_HEIGHT = 506
 CELL_WIDTH = 182    # 한 칸의 너비 (칸 시작 위치가 182px 간격으로 일정)
@@ -55,7 +57,8 @@ class Bird:
         self.frame = 0
 
     def update(self):
-        pass
+        # 프레임 번호도 실수로 누적한다: 경과 시간 x 초당 프레임 수
+        self.frame = (self.frame + FLIGHT_FRAMES_PER_SECOND * game_framework.frame_time) % FRAME_COUNT
 
     def draw(self):
         left, bottom, w, h, center_dx, center_dy = FRAMES[int(self.frame)]

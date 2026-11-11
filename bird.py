@@ -53,12 +53,13 @@ FRAMES = [frame_rect(i) for i in range(FRAME_COUNT)]
 class Bird:
     image = None  # 모든 새가 공유하는 스프라이트 시트 (한 번만 로딩)
 
-    def __init__(self, x, y):
+    def __init__(self, x, y, scale=0.5):
         if Bird.image is None:
             Bird.image = load_image('bird_animation.png')
         self.x, self.y = x, y
         self.frame = 0
         self.dir = 1  # 1: 오른쪽, -1: 왼쪽
+        self.scale = scale
 
     def update(self):
         # 프레임 번호도 실수로 누적한다: 경과 시간 x 초당 프레임 수
@@ -66,8 +67,9 @@ class Bird:
         # 이동 거리 = 속도 x 경과 시간
         self.x += self.dir * FLIGHT_SPEED_PPS * game_framework.frame_time
         # 화면 양 끝에서는 넘어간 만큼 되돌아오며(반사) 방향을 바꾼다
-        left_limit = BIRD_BACK_EXTENT
-        right_limit = get_canvas_width() - BIRD_BACK_EXTENT
+        margin = BIRD_BACK_EXTENT * self.scale
+        left_limit = margin
+        right_limit = get_canvas_width() - margin
         if self.x > right_limit:
             self.x = 2 * right_limit - self.x
             self.dir = -1
@@ -79,9 +81,10 @@ class Bird:
         left, bottom, w, h, center_dx, center_dy = FRAMES[int(self.frame)]
         # (self.x, self.y)가 눈 위치가 되도록 사각형 중심을 옮겨서 그린다
         # 왼쪽을 볼 때는 좌우반전되므로 눈에서 중심까지의 x 거리도 반대가 된다
-        x = self.x + center_dx * self.dir
-        y = self.y + center_dy
+        x = self.x + center_dx * self.dir * self.scale
+        y = self.y + center_dy * self.scale
+        draw_w, draw_h = int(w * self.scale), int(h * self.scale)
         if self.dir == 1:
-            Bird.image.clip_draw(left, bottom, w, h, x, y)
+            Bird.image.clip_draw(left, bottom, w, h, x, y, draw_w, draw_h)
         else:
-            Bird.image.clip_composite_draw(left, bottom, w, h, 0, 'h', x, y, w, h)
+            Bird.image.clip_composite_draw(left, bottom, w, h, 0, 'h', x, y, draw_w, draw_h)

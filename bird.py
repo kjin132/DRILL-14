@@ -1,3 +1,5 @@
+import random
+
 from pico2d import load_image, get_canvas_width
 
 import game_framework
@@ -59,11 +61,11 @@ FORMATION_SPACING_Y = 36  # 한 줄 뒤로 갈수록 위/아래로 벌어지는 
 class Bird:
     image = None  # 모든 새가 공유하는 스프라이트 시트 (한 번만 로딩)
 
-    def __init__(self, x, y, scale=0.5):
+    def __init__(self, x, y, scale=0.5, phase=0.0):
         if Bird.image is None:
             Bird.image = load_image('bird_animation.png')
         self.x, self.y = x, y
-        self.frame = 0
+        self.frame = phase % FRAME_COUNT  # 날갯짓이 시작되는 지점
         self.dir = 1  # 1: 오른쪽, -1: 왼쪽
         self.scale = scale
 
@@ -98,9 +100,10 @@ class Bird:
 
 def make_v_formation(leader_x, leader_y):
     """오른쪽을 보고 나는 V자 편대(리더 1마리 + 뒤쪽 6마리)를 만들어 돌려준다."""
-    birds = [Bird(leader_x, leader_y)]
+    birds = [Bird(leader_x, leader_y, phase=random.uniform(0, FRAME_COUNT))]
     for k in range(1, FORMATION_PAIRS + 1):
         for side in (+1, -1):
             birds.append(Bird(leader_x - k * FORMATION_SPACING_X,
-                              leader_y + side * k * FORMATION_SPACING_Y))
+                              leader_y + side * k * FORMATION_SPACING_Y,
+                              phase=random.uniform(0, FRAME_COUNT)))
     return birds

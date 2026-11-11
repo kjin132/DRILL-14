@@ -19,6 +19,10 @@ FLIGHT_SPEED_MPM = FLIGHT_SPEED_KMPH * 1000.0 / 60.0
 FLIGHT_SPEED_MPS = FLIGHT_SPEED_MPM / 60.0
 FLIGHT_SPEED_PPS = FLIGHT_SPEED_MPS * PIXEL_PER_METER
 
+# 창을 끌거나 잠깐 멈춘 뒤에 frame_time이 커져도 한 번에 튀지 않도록 상한을 둔다
+MAX_FRAME_TIME = 0.1
+
+
 # --- 날갯짓 속도 ---
 # 날개를 한 바퀴(14프레임) 젓는 동안 새가 날아가는 거리를 정해 두면,
 # 비행 속도로부터 1초당 몇 프레임을 넘겨야 하는지가 정해진다.
@@ -81,11 +85,12 @@ class Bird:
 
     def update(self):
         # 프레임 번호도 실수로 누적한다: 경과 시간 x 초당 프레임 수
-        self.frame = (self.frame + FLIGHT_FRAMES_PER_SECOND * game_framework.frame_time) % FRAME_COUNT
+        dt = min(game_framework.frame_time, MAX_FRAME_TIME)
+        self.frame = (self.frame + FLIGHT_FRAMES_PER_SECOND * dt) % FRAME_COUNT
         self.y = self.base_y + BOB_AMPLITUDE * math.sin(
             2 * math.pi * (self.frame - BOB_PHASE_FRAME) / FRAME_COUNT)
         # 이동 거리 = 속도 x 경과 시간
-        self.x += self.dir * FLIGHT_SPEED_PPS * game_framework.frame_time
+        self.x += self.dir * FLIGHT_SPEED_PPS * dt
         # 화면 양 끝에서는 넘어간 만큼 되돌아오며(반사) 방향을 바꾼다
         margin = BIRD_BACK_EXTENT * self.scale
         left_limit = margin

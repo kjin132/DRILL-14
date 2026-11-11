@@ -128,7 +128,7 @@ class Boy:
     def fire_ball(self):
         if self.item is None:
             return
-        ball = Ball(self.x, self.y, self.face_dir * 10, 1 if self.item == 'Ball' else 2)
+        ball = Ball(self.x, self.y, self.face_dir, 1 if self.item == 'Ball' else 2)
         game_world.add_oject(ball)
 
     def pause(self):

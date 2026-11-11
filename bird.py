@@ -103,23 +103,28 @@ FORMATION_SCALE_STEP = 0.03  # 한 줄 뒤로 갈수록 작아지는 정도 (원
 class Bird:
     image = None  # 모든 새가 공유하는 스프라이트 시트 (한 번만 로딩)
 
-    def __init__(self, x, y, scale=0.5, phase=0.0):
+    def __init__(self, x, y, direction=1, scale=0.5, speed_kmph=FLIGHT_SPEED_KMPH, phase=0.0):
         if Bird.image is None:
             Bird.image = load_image('bird_animation.png')
         self.x, self.y = x, y
         self.base_y = y  # 날아다니는 높이(상하 움직임의 중심)
         self.frame = phase % FRAME_COUNT  # 날갯짓이 시작되는 지점
-        self.dir = 1  # 1: 오른쪽, -1: 왼쪽
+        self.dir = direction  # 1: 오른쪽, -1: 왼쪽
         self.scale = scale
+        # 속도는 새마다 따로 가진다: km/h -> m/s -> pixel/s
+        speed_mps = speed_kmph * 1000.0 / 60.0 / 60.0
+        self.speed_pps = speed_mps * PIXEL_PER_METER
+        # 날갯짓은 그 새의 속도에서 계산한다 (빨리 나는 새가 날개도 더 빨리 젓는다)
+        self.frames_per_second = speed_mps / WINGBEAT_DISTANCE_M * FRAME_COUNT
 
     def update(self):
         dt = min(game_framework.frame_time, MAX_FRAME_TIME)
         # 프레임 번호도 실수로 누적한다: 경과 시간 x 초당 프레임 수
-        self.frame = (self.frame + FLIGHT_FRAMES_PER_SECOND * dt) % FRAME_COUNT
+        self.frame = (self.frame + self.frames_per_second * dt) % FRAME_COUNT
         self.y = self.base_y + BOB_AMPLITUDE * math.sin(
             2 * math.pi * (self.frame - BOB_PHASE_FRAME) / FRAME_COUNT)
         # 이동 거리 = 속도 x 경과 시간
-        self.x += self.dir * FLIGHT_SPEED_PPS * dt
+        self.x += self.dir * self.speed_pps * dt
         # 화면 양 끝에서는 넘어간 만큼 되돌아오며(반사) 방향을 바꾼다
         margin = BIRD_BACK_EXTENT * self.scale
         left_limit = margin

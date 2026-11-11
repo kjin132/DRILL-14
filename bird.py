@@ -1,3 +1,4 @@
+import math
 import random
 
 from pico2d import load_image, get_canvas_width
@@ -26,6 +27,12 @@ FLIGHT_FRAMES_PER_SECOND = FLIGHT_SPEED_MPS / WINGBEAT_DISTANCE_M * FRAME_COUNT 
 
 # 눈에서 꼬리/날개 끝까지 가장 먼 거리: 이만큼은 화면 안에 남겨야 잘리지 않는다
 BIRD_BACK_EXTENT = 125
+
+# --- 날갯짓에 맞춘 상하 움직임 ---
+# 날개가 내려가는 구간(프레임 5~9 부근)에서 양력으로 몸이 위로 올라가고,
+# 날개를 올리는 구간에서 조금 내려간다. 날갯짓과 같은 주기의 사인파로 만든다.
+BOB_AMPLITUDE = 6.0     # 위아래로 움직이는 폭 (pixel)
+BOB_PHASE_FRAME = 3.5   # 사인파가 0에서 올라가기 시작하는 프레임 -> 7번 프레임에서 가장 높다
 
 
 # 몸통(눈)을 기준점으로 쓰기 위한 값. 칸 안에서 눈의 x는 모든 프레임이 같고,
@@ -67,6 +74,7 @@ class Bird:
         if Bird.image is None:
             Bird.image = load_image('bird_animation.png')
         self.x, self.y = x, y
+        self.base_y = y  # 날아다니는 높이(상하 움직임의 중심)
         self.frame = phase % FRAME_COUNT  # 날갯짓이 시작되는 지점
         self.dir = 1  # 1: 오른쪽, -1: 왼쪽
         self.scale = scale
@@ -74,6 +82,8 @@ class Bird:
     def update(self):
         # 프레임 번호도 실수로 누적한다: 경과 시간 x 초당 프레임 수
         self.frame = (self.frame + FLIGHT_FRAMES_PER_SECOND * game_framework.frame_time) % FRAME_COUNT
+        self.y = self.base_y + BOB_AMPLITUDE * math.sin(
+            2 * math.pi * (self.frame - BOB_PHASE_FRAME) / FRAME_COUNT)
         # 이동 거리 = 속도 x 경과 시간
         self.x += self.dir * FLIGHT_SPEED_PPS * game_framework.frame_time
         # 화면 양 끝에서는 넘어간 만큼 되돌아오며(반사) 방향을 바꾼다

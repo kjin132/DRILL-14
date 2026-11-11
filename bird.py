@@ -24,7 +24,6 @@ bird_animation.png(918 x 506)에는 날갯짓 한 바퀴를 이루는 14장이 5
    새떼의 속도는 모두 같으므로 한 마리씩 차례로 반사되어도 V자 편대가 그대로 유지된다.
 """
 import math
-import random
 
 from pico2d import load_image, get_canvas_width
 
@@ -90,16 +89,6 @@ FLIGHT_FRAMES_PER_SECOND = FLIGHT_SPEED_MPS / WINGBEAT_DISTANCE_M * FRAME_COUNT 
 BOB_AMPLITUDE = 6.0     # 위아래로 움직이는 폭 (pixel)
 BOB_PHASE_FRAME = 3.5   # 사인파가 0에서 올라가기 시작하는 프레임 -> 7번 프레임에서 가장 높다
 
-# ---------------------------------------------------------------------------
-# 4. V자 편대
-# ---------------------------------------------------------------------------
-FORMATION_PAIRS = 3          # 리더 뒤로 3줄 (줄마다 위/아래 한 마리씩)
-FORMATION_SPACING_X = 90     # 한 줄 뒤로 물러나는 거리
-FORMATION_SPACING_Y = 36     # 한 줄 뒤로 갈수록 위/아래로 벌어지는 거리
-LEADER_SCALE = 0.55          # 리더의 크기
-FORMATION_SCALE_STEP = 0.03  # 한 줄 뒤로 갈수록 작아지는 정도 (원근감)
-
-
 class Bird:
     image = None  # 모든 새가 공유하는 스프라이트 시트 (한 번만 로딩)
 
@@ -147,15 +136,3 @@ class Bird:
             Bird.image.clip_draw(left, bottom, w, h, x, y, draw_w, draw_h)
         else:
             Bird.image.clip_composite_draw(left, bottom, w, h, 0, 'h', x, y, draw_w, draw_h)
-
-
-def make_v_formation(leader_x, leader_y):
-    """오른쪽을 보고 나는 V자 편대(리더 1마리 + 뒤쪽 6마리)를 만들어 돌려준다."""
-    birds = [Bird(leader_x, leader_y, LEADER_SCALE, random.uniform(0, FRAME_COUNT))]
-    for k in range(1, FORMATION_PAIRS + 1):
-        for side in (+1, -1):
-            birds.append(Bird(leader_x - k * FORMATION_SPACING_X,
-                              leader_y + side * k * FORMATION_SPACING_Y,
-                              LEADER_SCALE - k * FORMATION_SCALE_STEP,
-                              random.uniform(0, FRAME_COUNT)))
-    return birds

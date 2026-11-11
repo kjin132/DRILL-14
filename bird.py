@@ -14,6 +14,12 @@ FLIGHT_SPEED_MPM = FLIGHT_SPEED_KMPH * 1000.0 / 60.0
 FLIGHT_SPEED_MPS = FLIGHT_SPEED_MPM / 60.0
 FLIGHT_SPEED_PPS = FLIGHT_SPEED_MPS * PIXEL_PER_METER
 
+# --- 날갯짓 속도 ---
+# 날개를 한 바퀴(14프레임) 젓는 동안 새가 날아가는 거리를 정해 두면,
+# 비행 속도로부터 1초당 몇 프레임을 넘겨야 하는지가 정해진다.
+WINGBEAT_DISTANCE_M = 5.0
+FLIGHT_FRAMES_PER_SECOND = FLIGHT_SPEED_MPS / WINGBEAT_DISTANCE_M * FRAME_COUNT  # 10 / 5 * 14 = 28
+
 
 # 몸통(눈)을 기준점으로 쓰기 위한 값. 칸 안에서 눈의 x는 모든 프레임이 같고,
 # y는 프레임마다 조금씩 다르다 (시트 전체 기준 y, 위가 0).

@@ -7,6 +7,13 @@ SHEET_COLUMNS = 5   # 한 줄에 5마리
 FRAME_COUNT = 14    # 5 + 5 + 4 = 날갯짓 한 바퀴가 14장
 # 줄마다 (위쪽 경계, 아래쪽 경계). 그림 좌표계(위가 0)이고 줄 사이는 빈 공간이다.
 ROW_BOUNDS = [(0, 180), (180, 360), (360, 506)]
+# --- 비행 속도 (단위 변환: km/h -> m/min -> m/s -> pixel/s) ---
+PIXEL_PER_METER = (10.0 / 0.3)  # 10 pixel = 30 cm
+FLIGHT_SPEED_KMPH = 36.0        # 새떼의 순항 속도
+FLIGHT_SPEED_MPM = FLIGHT_SPEED_KMPH * 1000.0 / 60.0
+FLIGHT_SPEED_MPS = FLIGHT_SPEED_MPM / 60.0
+FLIGHT_SPEED_PPS = FLIGHT_SPEED_MPS * PIXEL_PER_METER
+
 
 # 몸통(눈)을 기준점으로 쓰기 위한 값. 칸 안에서 눈의 x는 모든 프레임이 같고,
 # y는 프레임마다 조금씩 다르다 (시트 전체 기준 y, 위가 0).

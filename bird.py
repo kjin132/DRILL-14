@@ -28,6 +28,10 @@ def frame_rect(index):
     return col * CELL_WIDTH, SHEET_HEIGHT - bottom_edge, CELL_WIDTH, height, center_dx, center_dy
 
 
+# 매 프레임 계산하지 않도록 모듈을 불러올 때 14장을 한 번에 계산해 둔다
+FRAMES = [frame_rect(i) for i in range(FRAME_COUNT)]
+
+
 class Bird:
     image = None  # 모든 새가 공유하는 스프라이트 시트 (한 번만 로딩)
 
@@ -41,6 +45,6 @@ class Bird:
         pass
 
     def draw(self):
-        left, bottom, w, h, center_dx, center_dy = frame_rect(int(self.frame))
+        left, bottom, w, h, center_dx, center_dy = FRAMES[int(self.frame)]
         # (self.x, self.y)가 눈 위치가 되도록 사각형 중심을 옮겨서 그린다
         Bird.image.clip_draw(left, bottom, w, h, self.x + center_dx, self.y + center_dy)
